@@ -166,3 +166,5 @@ class StudGenericList(generics.ListCreateAPIView):
 class StudGenericDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = StudDetails.objects.all()
     serializer_class = serialization
+def func():
+    pass
