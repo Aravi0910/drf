@@ -8,8 +8,15 @@ class StudDetails(models.Model):
     stud_email = models.CharField(max_length=100)
     stud_address = models.CharField(max_length=100)
 
-class Cricketers(models.Model):
-    cricket_id = models.UUIDField(default=uuid.uuid3)
+class Team(models.Model):
+    team_name = models.CharField(max_length=50)
+
+class CricketPlayers(models.Model):    
     name = models.CharField(max_length=50)
     role = models.CharField(max_length=50)
-    nation = models.CharField(max_length=50)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True, related_name='team')
+    country = models.CharField(max_length=50)
+
+class VoterId(models.Model):
+    name = models.CharField(max_length=30)
+    age = models.IntegerField()
