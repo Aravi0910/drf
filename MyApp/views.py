@@ -198,7 +198,22 @@ class CricketerFilters(APIView):
         return Response(serializer.data)
     
 # viewsets
-class CricketerViewsets(viewsets.ModelViewSet):
+class CricketerViewset(viewsets.ViewSet):
     queryset = CricketPlayers.objects.all()
-    serializer_class = Cricketer_list
+    def list(self, request):
+        serializer = Cricketer_list(self.queryset, many=True )
+        return Response(serializer.data)
+    
+    def retrieve(self, request, pk):
+        try:
+            queryset = CricketPlayers.objects.get(pk=pk)
+        except CricketPlayers.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+            
+        serializer = Cricketer_list(queryset)
+        return Response(serializer.data)
+
+class VoterViewset(viewsets.ModelViewSet):
+    queryset = VoterId.objects.all()
+    serializer_class = VotingPerson
     

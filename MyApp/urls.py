@@ -4,12 +4,12 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 router = DefaultRouter()
-router.register('cricketer', views.CricketerViewsets)
+router.register('cricketer', views.CricketerViewset)
+router.register('voter', views.VoterViewset)
 
 
 
 urlpatterns = [
-    path('', include(router.urls)),
     path('stud_list',views.stud_list, name='stud_list'),
     path('stud_get/<str:pk>',views.stud_get, name='stud_get'),
     path('stud_create', views.stud_create, name='stud_create'),
@@ -27,7 +27,9 @@ urlpatterns = [
     path('cricketerview', views.CricketerView.as_view()),   
     path('cricketerfilters/<str:pk>', views.CricketerFilters.as_view()),   
     path('votingMixinlist', views.VotingMixinList.as_view()),   
-    path('cricketerviewsets', views.CricketerViewsets.as_view({'get':'list'})),   
-]
-urlpatterns = format_suffix_patterns(urlpatterns)
+    path('cricketerviewsets', views.CricketerViewset.as_view({'get':'list', 'get':'retrieve'})),
+    path('voterviewset', views.VoterViewset.as_view({'get':'list', 'get':'retrieve', 'create':'put', 'delete':'destroy'})),
+    path('', include(router.urls)),
+ ]
+#urlpatterns = format_suffix_patterns(urlpatterns)
 
