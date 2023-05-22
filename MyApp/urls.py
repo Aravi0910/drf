@@ -1,6 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework.routers import DefaultRouter, SimpleRouter
+
+router = DefaultRouter()
+router.register('cricketer', views.CricketerViewset)
+router.register('voter', views.VoterViewset)
+
 
 
 urlpatterns = [
@@ -13,10 +19,17 @@ urlpatterns = [
     path('student_cv', views.student_cv,name='student_cv'),
     path('studentlist', views.StudentList.as_view()),
     path('student/<str:pk>', views.Student.as_view()),
-    path('studmixinlist', views.StudMixinList.as_view()),
+    path('studmixinlist', views.StudMixinList.as_view()), 
     path('studmixindetails/<str:pk>', views.StudMixinDetails.as_view()),    
     path('studgenericlist', views.StudGenericList.as_view()),    
-    path('studgenericdetails/<str:pk>', views.StudGenericDetails.as_view()),    
-]
-urlpatterns = format_suffix_patterns(urlpatterns)
+    path('studgenericdetails/<str:pk>', views.StudGenericDetails.as_view()), 
+    path('cricketerlist', views.CricketerList.as_view()),   
+    path('cricketerview', views.CricketerView.as_view()),   
+    path('cricketerfilters/<str:pk>', views.CricketerFilters.as_view()),   
+    path('votingMixinlist', views.VotingMixinList.as_view()),   
+    path('cricketerviewsets', views.CricketerViewset.as_view({'get':'list', 'get':'retrieve'})),
+    path('voterviewset', views.VoterViewset.as_view({'get':'list', 'get':'retrieve', 'create':'put', 'delete':'destroy'})),
+    path('', include(router.urls)),
+ ]
+#urlpatterns = format_suffix_patterns(urlpatterns)
 

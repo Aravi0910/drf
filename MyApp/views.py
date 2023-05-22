@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
-from .models import StudDetails
-from .serializer import serialization
+from .models import StudDetails, VoterId, CricketPlayers,Team
+from .serializer import serialization, VotingPerson, Cricketer_list
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, mixins, generics
 from rest_framework.views import APIView
+from rest_framework import viewsets
 
 
 
@@ -166,5 +167,53 @@ class StudGenericList(generics.ListCreateAPIView):
 class StudGenericDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = StudDetails.objects.all()
     serializer_class = serialization
-def func():
-    pass
+
+class CricketerList(generics.ListCreateAPIView):
+    queryset = CricketPlayers.objects.all()
+    serializer_class = Cricketer_list
+
+class CricketerView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CricketPlayers.objects.all()
+    serializer_class = Cricketer_list
+    
+
+class VotingMixinList(mixins.ListModelMixin,
+
+                    mixins.CreateModelMixin,
+                    generics.GenericAPIView):
+    queryset = VoterId.objects.all()
+    serializer_class = VotingPerson
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwagrs):
+        return self.create(request, *args, **kwagrs)
+    
+class CricketerFilters(APIView):
+    def get(self, request, pk):
+        team_name = Team.objects.get(pk=pk)
+        find = team_name.team.all()
+        serializer = Cricketer_list(find, many=True)
+        return Response(serializer.data)
+    
+# viewsets
+class CricketerViewset(viewsets.ViewSet):
+    queryset = CricketPlayers.objects.all()
+    def list(self, request):
+        serializer = Cricketer_list(self.queryset, many=True )
+        return Response(serializer.data)
+    
+    def retrieve(self, request, pk):
+        try:
+            queryset = CricketPlayers.objects.get(pk=pk)
+        except CricketPlayers.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+            
+        serializer = Cricketer_list(queryset)
+        return Response(serializer.data)
+
+class VoterViewset(viewsets.ModelViewSet):
+    queryset = VoterId.objects.all()
+    serializer_class = VotingPerson
+    
