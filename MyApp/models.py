@@ -1,5 +1,6 @@
 from django.db import models
-import uuid
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.base_user import BaseUserManager
 
 
 class StudDetails(models.Model):
@@ -20,3 +21,11 @@ class CricketPlayers(models.Model):
 class VoterId(models.Model):
     name = models.CharField(max_length=30)
     age = models.IntegerField()
+
+
+
+
+     
+   
+    
+   

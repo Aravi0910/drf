@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
-from .models import StudDetails, VoterId, CricketPlayers,Team
+from .models import StudDetails, VoterId, CricketPlayers, Team
 from .serializer import serialization, VotingPerson, Cricketer_list
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
@@ -9,7 +9,11 @@ from rest_framework.response import Response
 from rest_framework import status, mixins, generics
 from rest_framework.views import APIView
 from rest_framework import viewsets
-
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 @api_view(['GET'])
@@ -178,7 +182,6 @@ class CricketerView(generics.RetrieveUpdateDestroyAPIView):
     
 
 class VotingMixinList(mixins.ListModelMixin,
-
                     mixins.CreateModelMixin,
                     generics.GenericAPIView):
     queryset = VoterId.objects.all()
@@ -212,8 +215,63 @@ class CricketerViewset(viewsets.ViewSet):
             
         serializer = Cricketer_list(queryset)
         return Response(serializer.data)
+    
+class CricketerModelViewset(viewsets.ModelViewSet):
+    queryset = CricketPlayers.objects.all()
+    serializer_class = Cricketer_list
+    authentication_classes = [JWTAuthentication]     
+    permission_classes = [IsAuthenticated]
 
 class VoterViewset(viewsets.ModelViewSet):
     queryset = VoterId.objects.all()
-    serializer_class = VotingPerson
+    serializer_class = VotingPerson 
+    authentication_classes = [JWTAuthentication]   
+    permission_classes = [IsAuthenticated]
+
+class Trail(APIView):
+        authentication_classes = [JWTAuthentication, SessionAuthentication]
+        permission_classes = [IsAuthenticated]
+
+        def get(self, request):
+            content = {
+                "user" : str(request.user),
+                "auth" : str(request.auth)
+            }
+            return Response(content)
     
+class ThrottlingView(APIView):
+    throttle_classes = [UserRateThrottle]
+
+    def get(self, request):
+        cricketer_name = [cricketer.name for cricketer in CricketPlayers.objects.all()]
+        return Response(cricketer_name)
+
+#repath
+class FilterList(generics.ListAPIView):
+    serializer_class = Cricketer_list
+    authentication_classes = [JWTAuthentication, SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        team = self.kwargs['team']       
+        return CricketPlayers.objects.filter(Team__team_name = team)
+
+#repath 2
+class Filter(generics.ListAPIView):
+    serializer_class = Cricketer_list
+    queryset = CricketPlayers.objects.all()
+
+    def get_queryset(self):
+        teamname = self.request.query_params.get('team')
+        
+        if teamname is not None:
+            queryset = queryset.filter(Team__team_name = teamname)
+        return queryset
+
+#filter backends
+class CricketerFilterList(generics.ListAPIView):
+    queryset = CricketPlayers.objects.all()
+    serializer_class = Cricketer_list
+    authentication_classes = [JWTAuthentication, SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['team']

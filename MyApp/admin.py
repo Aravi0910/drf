@@ -4,3 +4,4 @@ from .models import Team, CricketPlayers
 admin.site.register(Team)
 admin.site.register(CricketPlayers)
 
+

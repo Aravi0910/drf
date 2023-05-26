@@ -11,7 +11,7 @@ class serialization(serializers.ModelSerializer):
         
 
 class Cricketer_list(serializers.ModelSerializer):    
-    team_name = serializers.CharField(source = 'team.team_name')
+    team_name = serializers.CharField(source = 'team.team_name', read_only = True)
     coach = serializers.SerializerMethodField()
     
     class Meta:
@@ -31,7 +31,8 @@ class Cricketer_list(serializers.ModelSerializer):
 class VotingPerson(serializers.ModelSerializer):
     class Meta:
         model = VoterId
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ['id']
         
     def validate(self, data):
         if data['age'] < 18:
@@ -42,3 +43,6 @@ class VotingPerson(serializers.ModelSerializer):
           
         else:
             return data
+
+
+    

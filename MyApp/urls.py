@@ -1,10 +1,12 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from . import views
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.routers import DefaultRouter, SimpleRouter
+from rest_framework_simplejwt import views as jwt_views
+
 
 router = DefaultRouter()
-router.register('cricketer', views.CricketerViewset)
+router.register('cricketer', views.CricketerModelViewset)
 router.register('voter', views.VoterViewset)
 
 
@@ -28,8 +30,20 @@ urlpatterns = [
     path('cricketerfilters/<str:pk>', views.CricketerFilters.as_view()),   
     path('votingMixinlist', views.VotingMixinList.as_view()),   
     path('cricketerviewsets', views.CricketerViewset.as_view({'get':'list', 'get':'retrieve'})),
-    path('voterviewset', views.VoterViewset.as_view({'get':'list', 'get':'retrieve', 'create':'put', 'delete':'destroy'})),
+    path('cricketermodelviewset', views.CricketerModelViewset.as_view({'get':'list', 'get':'retrieve', 'post':'create'})),
+    path('voterviewset', views.VoterViewset.as_view({'get':'list', 'get':'retrieve', 'post':'create', 'delete':'destroy'})),
     path('', include(router.urls)),
+    path('trail', views.Trail.as_view(), name = 'trail'),  
+    # path('user_viewset', views.UserViewset.as_view({'get':'list', 'post':'create'}), name = 'user_viewset'),  
+    # JWT 
+    path('api/token/',jwt_views.TokenObtainPairView.as_view(),name = 'token_obtain_pair'),
+    path('api/token/refresh', jwt_views.TokenRefreshView.as_view(), name = 'token_refresh'),  
+    # Throttling
+    path('throttlingview', views.ThrottlingView.as_view(), name = 'throttlingview'),  
+    # Filter
+    path('filterlist', views.FilterList.as_view(), name = 'filterlist'),  
+    path('cricketerfilterlist', views.CricketerFilterList.as_view(), name = 'cricketerfilterlist'),  
+    
  ]
 #urlpatterns = format_suffix_patterns(urlpatterns)
 
