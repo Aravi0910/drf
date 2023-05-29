@@ -22,6 +22,11 @@ class VoterId(models.Model):
     name = models.CharField(max_length=30)
     age = models.IntegerField()
 
+class Book(models.Model):
+    book_name = models.CharField(max_length=50)
+    author = models.CharField(max_length=50)
+    
+
 
 
 
