@@ -3,6 +3,7 @@ from . import views
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_simplejwt import views as jwt_views
+from rest_framework.schemas import get_schema_view
 
 
 router = DefaultRouter()
@@ -43,7 +44,14 @@ urlpatterns = [
     # Filter
     path('filterlist', views.FilterList.as_view(), name = 'filterlist'),  
     path('cricketerfilterlist', views.CricketerFilterList.as_view(), name = 'cricketerfilterlist'),  
-    
+    path('cricketerpagelist', views.CricketerPagelist.as_view(), name = 'cricketerpagelist'),  
+    path('parserview', views.ParserView.as_view(), name = 'parserview'),  
+    path('api/v1/books', views.BookView.as_view(), name = 'books_api_v1'),      
+    path('api/v2/books', views.BookView.as_view(), name = 'books_api_v2'),      
+    path('openapi', get_schema_view(
+        title='MyProject',
+        description='detail schema about my project',
+        version='1.0.0'),name='openapi-schema'),
  ]
 #urlpatterns = format_suffix_patterns(urlpatterns)
 

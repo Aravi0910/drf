@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import StudDetails, VoterId, CricketPlayers, Team
+from .models import StudDetails, VoterId, CricketPlayers, Team, Book
 
 
 class serialization(serializers.ModelSerializer):
@@ -44,5 +44,7 @@ class VotingPerson(serializers.ModelSerializer):
         else:
             return data
 
-
-    
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = '__all__'

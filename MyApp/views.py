@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from django.utils.timezone import now
 from rest_framework.parsers import JSONParser
-from .models import StudDetails, VoterId, CricketPlayers, Team
-from .serializer import serialization, VotingPerson, Cricketer_list
+from .models import StudDetails, VoterId, CricketPlayers, Team, Book
+from .serializer import serialization, VotingPerson, Cricketer_list, BookSerializer
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -13,7 +14,13 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from .pagination import CustomPagination
+from rest_framework.versioning import URLPathVersioning
+from rest_framework.metadata import SimpleMetadata
+from rest_framework.reverse import reverse, reverse_lazy
+
 
 
 @api_view(['GET'])
@@ -269,9 +276,34 @@ class Filter(generics.ListAPIView):
 
 #filter backends
 class CricketerFilterList(generics.ListAPIView):
-    queryset = CricketPlayers.objects.all()
-    serializer_class = Cricketer_list
     authentication_classes = [JWTAuthentication, SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['team']
+    queryset = CricketPlayers.objects.all()
+    serializer_class = Cricketer_list
+    #pagination_class = [CustomPagination]
+    #filter_backends = [DjangoFilterBackend]
+    filter_backends = [OrderingFilter]
+    filterset_fields = ['team__team_name']
+    ordering_fields = ['name']
+    ordering = ['name']
+    #search_fields = ['name', 'role','team__team_name']
+
+# pagination 
+class CricketerPagelist(generics.ListAPIView):
+    authentication_classes = [JWTAuthentication, SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = CricketPlayers.objects.all()
+    serializer_class = Cricketer_list
+    pagination_class = CustomPagination
+
+class BookView(generics.ListCreateAPIView):
+    metadata_class = SimpleMetadata
+    versioning_class = URLPathVersioning        
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+class ParserView(APIView):
+    parser_classes = [JSONParser]
+
+    def post(self, request):
+        return Response({'received data': request.data})
